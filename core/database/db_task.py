@@ -133,6 +133,20 @@ class Task:
             self.cursor.execute(query, (user_id, task_id))
             self.connection.commit()
 
+    def is_exist(self, user_id, task_id):
+        with self.connection:
+            query = 'SELECT count(*) from public.tasks where user_id = %s and id = %s;'
+            self.cursor.execute(query, (user_id, task_id))
+            res = self.cursor.fetchone()
+            return res
+
+    def check_status(self, user_id, task_id):
+        with self.connection:
+            query = 'SELECT status from public.tasks where user_id = %s and id = %s;'
+            self.cursor.execute(query, (user_id, task_id))
+            res = self.cursor.fetchone()
+            return res
+
 if __name__ == '__main__':
     # create_db()
     obj = Task()

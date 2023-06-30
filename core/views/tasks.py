@@ -36,10 +36,14 @@ async def take_desc(message: Message, state: FSMContext):
     await message.answer(text=result[0], reply_markup=kb)
 
 
-async def show_tasks(message: Message):
+async def show_tasks(message: Message, bot: Bot):
     user_id = message.from_user.id
     ids, statuses, result = obj.get_tasks(user_id)
     if ids:
         for i in range(len(ids)):
             kb = done_delete_kb(ids[i], status=statuses[i])
             await message.answer(text=result[i], reply_markup=kb)
+    else:
+        sticker = "CAACAgIAAxkBAAEJiEhknb2jxsbNGXKMXJcKSowK2dGg1gACSxYAArVkIEitLhBSiib0gS8E"
+        await bot.send_sticker(chat_id=message.chat.id, sticker=sticker)
+        await message.answer(text="Список пуст =(")
