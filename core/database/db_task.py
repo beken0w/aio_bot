@@ -147,6 +147,7 @@ class Task:
             res = self.cursor.fetchone()
             return res
 
+
 if __name__ == '__main__':
     # create_db()
     obj = Task()
