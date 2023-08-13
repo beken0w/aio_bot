@@ -60,12 +60,12 @@ class Task:
         result = []
         for row in rows:
             ids.append(row[0])
-            statuses.append(row[4])
+            statuses.append(row[5])
             result.append(
-                f"{' '*40}Задача №{row[0]}\n\n"
-                f"Заголовок: {row[2]}\n"
-                f"Описание: {row[3]}\n"
-                f"Статус: {'💼 Не выполнена' if row[4] == 0 else '✅ Выполнена'}"
+                f"📋 {row[3]}\n\n"
+                f"📂 {row[2]}\n"
+                f"Описание: {row[4]}\n"
+                f"Статус: {'💼 Не выполнена' if row[5] == 0 else '✅ Выполнена'}"
             )
         return ids, statuses, result
 
@@ -75,6 +75,7 @@ class Task:
             query = "CREATE TABLE tasks ( "\
                     "id SERIAL PRIMARY KEY NOT NULL, "\
                     "user_id bigint NOT NULL, "\
+                    "category TEXT NOT NULL, "\
                     "title TEXT NOT NULL, "\
                     "description TEXT NOT NULL, "\
                     "status INTEGER NOT NULL DEFAULT (0));"
@@ -94,16 +95,28 @@ class Task:
     def create_task(self, data):
         with self.connection:
             query = "INSERT INTO public.tasks("\
-                    "user_id, title, description)"\
-                    "VALUES (%s, %s, %s);"
+                    "user_id, category, title, description)"\
+                    "VALUES (%s, %s, %s, %s);"
             self.cursor.execute(query,
-                                (data["user_id"], data["title"], data["desc"]))
+                                (data["user_id"], data["category"],
+                                 data["title"], data["desc"]))
             self.connection.commit()
 
     def get_tasks(self, user_id):
         with self.connection:
-            query = "SELECT * FROM public.tasks WHERE user_id = %s ORDER BY id"
+            query = "SELECT * FROM public.tasks "\
+                    "WHERE user_id = %s ORDER BY id"
             self.cursor.execute(query, (user_id,))
+            res = self.__beautify_response(self.cursor.fetchall())
+            return res
+
+    def get_tasks_by_category(self, data):
+        with self.connection:
+            query = "SELECT * FROM public.tasks "\
+                    "WHERE user_id = %s "\
+                    "and category = %s ORDER BY id"
+            self.cursor.execute(query, (data['user_id'],
+                                        data['category']))
             res = self.__beautify_response(self.cursor.fetchall())
             return res
 
@@ -126,6 +139,16 @@ class Task:
             self.cursor.execute(query, (user_id, task_id))
             self.connection.commit()
 
+    def update_category(self, data):
+        with self.connection:
+            query = "UPDATE public.tasks "\
+                    "SET category = %s "\
+                    "WHERE user_id = %s and category = %s;"
+            self.cursor.execute(query, (data['new_title'],
+                                        data['user_id'],
+                                        data['old_title']))
+            self.connection.commit()
+
     def delete_task(self, user_id, task_id):
         with self.connection:
             query = "DELETE FROM public.tasks \
@@ -135,19 +158,22 @@ class Task:
 
     def is_exist(self, user_id, task_id):
         with self.connection:
-            query = 'SELECT count(*) from public.tasks where user_id = %s and id = %s;'
+            query = 'SELECT count(*) from public.tasks '\
+                    'where user_id = %s and id = %s;'
             self.cursor.execute(query, (user_id, task_id))
             res = self.cursor.fetchone()
             return res
 
     def check_status(self, user_id, task_id):
         with self.connection:
-            query = 'SELECT status from public.tasks where user_id = %s and id = %s;'
+            query = 'SELECT status from public.tasks '\
+                    'where user_id = %s and id = %s;'
             self.cursor.execute(query, (user_id, task_id))
             res = self.cursor.fetchone()
             return res
 
+
 if __name__ == '__main__':
     # create_db()
     obj = Task()
-    obj.fixtures_tasks()
+    obj.create_table_tasks()

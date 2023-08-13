@@ -19,6 +19,6 @@ async def stop_bot(bot: Bot):
     await bot.send_message(MY_TG_ID, "Бот остановлен")
 
 
-async def welcome(message: Message, bot: Bot):
+async def welcome(message: Message):
     await message.answer(f"Привет, {message.from_user.first_name}",
                          reply_markup=permanent_kb())

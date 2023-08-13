@@ -1,25 +1,28 @@
 import os
 import logging
-import datetime
 
 from dotenv import load_dotenv
 import asyncio
 from aiogram import Bot, Dispatcher, F
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import Text
 
 from core.views.welcome import welcome, start_bot, stop_bot
-from core.views import tasks
-from core.states.task_state import TaskState
-from core.views.callback import done_task, delete_task
+from core.views.categories import router_cat
+from core.views.tasks import router_task
 
 
 load_dotenv()
 
 
 # Настройка логгов
-logging.basicConfig(level=logging.INFO,
-                    filename='log_file.log',
-                    filemode='a')
+logging.basicConfig(
+    filename='app.log',
+    level=logging.INFO,
+    encoding='utf-8',
+    filemode='w',
+    format='%(asctime)s | %(levelname)s | %(name)s | %(message)s',
+    datefmt=r'| %H:%M | %d.%m.%Y')
+logger = logging.getLogger(__name__)
 
 
 async def start():
@@ -30,27 +33,18 @@ async def start():
     # dp.startup.register(start_bot)
     # dp.shutdown.register(stop_bot)
 
-    # регистируем вьюшки
-    # Получае данные для создания задачи
-    dp.callback_query.register(done_task, F.data.startswith("/done"))
-    dp.callback_query.register(delete_task, F.data.startswith("/delete"))
-    dp.message.register(tasks.show_tasks, F.text == 'Список задач')
-    dp.message.register(tasks.take_id, F.text == 'Создать задачу')
-    dp.message.register(tasks.take_title, TaskState.GET_TITLE)
-    dp.message.register(tasks.take_desc, TaskState.GET_DESCRIPTION)
-
-    dp.message.register(welcome, CommandStart)
+    # регистируем вьюшкиs
+    dp.message.register(welcome, Text('/start'))
+    dp.include_routers(router_task, router_cat)
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)
+        logger.info("Токен успешно получен. Запускаю бота")
         await dp.start_polling(bot)
-        date_time = datetime.datetime.now().replace(microsecond=0)
-        logging.info(f"\n{'='*30}[ {date_time} ]{'='*30}\n")
-        logging.info("Токен успешно получен. Запускаю бота")
 
     finally:
         await bot.session.close()
-        logging.info("Бот остановлен")
+        logger.info("Бот остановлен")
 
 
 if __name__ == '__main__':
