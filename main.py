@@ -30,8 +30,8 @@ async def start():
     dp = Dispatcher()
 
     # при запуске и остановке выводит сообщение админу
-    dp.startup.register(start_bot)
-    dp.shutdown.register(stop_bot)
+    # dp.startup.register(start_bot)
+    # dp.shutdown.register(stop_bot)
 
     # регистируем вьюшки
     dp.message.register(welcome, Text('/start'))
