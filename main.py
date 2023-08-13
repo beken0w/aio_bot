@@ -3,7 +3,7 @@ import logging
 
 from dotenv import load_dotenv
 import asyncio
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher
 from aiogram.filters import Text
 
 from core.views.welcome import welcome, start_bot, stop_bot
