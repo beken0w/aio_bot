@@ -1,5 +1,5 @@
 import os
-from aiogram.types import Message
+from aiogram.types import Message, BotCommand
 from aiogram import Bot
 from dotenv import load_dotenv
 
@@ -11,7 +11,18 @@ load_dotenv()
 MY_TG_ID = os.getenv("MY_TG_ID")
 
 
+async def set_commands(bot: Bot):
+    commands = [
+        BotCommand(
+            command='/start',
+            description='Запустить'
+        ),
+    ]
+    await bot.set_my_commands(commands)
+
+
 async def start_bot(bot: Bot):
+    await set_commands(bot)
     await bot.send_message(MY_TG_ID, "Бот запущен")
 
 
