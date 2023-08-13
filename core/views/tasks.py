@@ -36,6 +36,8 @@ async def task_create_category(call: CallbackQuery, state: FSMContext):
         await call.message.answer("Введите название Категории ⬇️")
         await state.set_state(TaskState.CREATE_CATEGORY)
         return
+    await call.message.edit_text(
+        f"Выбрана категория: {call.data.replace('/choose_ctgr ', '')}")
     await state.update_data(category=call.data.replace('/choose_ctgr ', ''))
     await call.message.answer("Введите заголовок задачи ⬇️")
     await state.set_state(TaskState.GET_TITLE)
@@ -99,6 +101,7 @@ async def show_tasks_by_category(message: Message, state: FSMContext):
 async def show_tasks_by_category_finish(call: CallbackQuery,
                                         state: FSMContext):
     await call.answer()
+    await call.message.delete()
     await state.update_data(category=call.data.replace('/choose_ctgr ', ''))
     context_data = await state.get_data()
 
