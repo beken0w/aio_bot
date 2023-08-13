@@ -110,10 +110,11 @@ async def show_tasks_by_category_finish(call: CallbackQuery,
     else:
         await call.message.answer(
             text=f"Список категории '{context_data['category']}' пуст")
+    await state.clear()
 
 
 @router_task.callback_query(F.data.startswith("/done_task"))
-async def done_task(call: CallbackQuery):
+async def done_task(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
     task_id = call.data.split()[1]
@@ -144,10 +145,11 @@ async def done_task(call: CallbackQuery):
         await call.message.edit_text(
             inline_message_id=message_id,
             text=f"Упс, задача {task_id} была ранее удалена")
+    await state.clear()
 
 
 @router_task.callback_query(F.data.startswith("/delete_task"))
-async def delete_task(call: CallbackQuery):
+async def delete_task(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
     task_id = call.data.split()[1]
@@ -162,3 +164,4 @@ async def delete_task(call: CallbackQuery):
         await call.message.edit_text(
             inline_message_id=message_id,
             text="Упс, задача была ранее удалена")
+    await state.clear()

@@ -34,7 +34,7 @@ async def category_create_finish(message: Message, state: FSMContext):
 
 
 @router_cat.message(Text('🗂️ Мои категории'))
-async def show_catogories(message: Message, bot: Bot):
+async def show_catogories(message: Message, bot: Bot, state: FSMContext):
     user_id = message.from_user.id
     result = obj.get_all_categories(user_id)
     if result:
@@ -46,6 +46,7 @@ async def show_catogories(message: Message, bot: Bot):
                   "JcKSowK2dGg1gACSxYAArVkIEitLhBSiib0gS8E"
         await bot.send_sticker(chat_id=message.chat.id, sticker=sticker)
         await message.answer(text="Вы еще не создали категории =(")
+    await state.clear()
 
 
 @router_cat.callback_query(F.data.startswith("/delete_ctgr"))

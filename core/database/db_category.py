@@ -91,7 +91,6 @@ class Category:
                 self.cursor.execute(query,
                                     (user_id, ctgr_id))
                 self.connection.commit()
-                logging.error("TEST:")
             except Exception as e:
                 logging.error(f"Ошибка: {e}")
 
